@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+#------------------------------------------------------Entrada txt-----------------------------------------------------#
 
 ''' Abrir archivo recibe un archivo txt y almacena su contenido en la variable lineas'''
 def abrir_archivo():
@@ -102,3 +103,44 @@ def mochila_progra_dinamica():
 
 
 #-------------------------------------------------------Mochila FB-----------------------------------------------------#
+
+def mochila_fuerza_bruta():
+    entrada = abrir_archivo()
+    w = entrada[0][0]
+    elementos = np.array(entrada[1:])
+    elementos_ordenados = elementos[np.argsort(elementos[:, 0])]
+    elementos_distribuidos = distribuir_entrada(elementos_ordenados)
+    n = len(elementos_distribuidos)
+    soluciones = []
+    beneficio = mochila_recursiva(w,elementos_distribuidos,n,entrada,soluciones)
+    respuesta = generador_lista_de_ceros(len(entrada)-1)
+    for i in range(len(soluciones)):
+        respuesta[entrada.index(soluciones[i])-1] += 1
+    print(beneficio)
+    for i in range(len(respuesta)):
+        if respuesta[i]!=0:
+            print(str(i+1)+","+str(respuesta[i]))
+
+def mochila_recursiva(w, elementos_distribuidos,n,entrada,soluciones):
+    lista_llevo = []
+    lista_no_llevo = []
+
+    if n == 0 or w == 0:
+        return 0
+    if (elementos_distribuidos[n-1][0] > w):
+        return mochila_recursiva(w, elementos_distribuidos, n - 1,entrada,lista_no_llevo)
+
+    lista_llevo.append(elementos_distribuidos[n-1].tolist())
+
+    llevo = elementos_distribuidos[n-1][1] + mochila_recursiva(w - elementos_distribuidos[n-1][0], elementos_distribuidos, n - 1, entrada ,lista_llevo)
+    no_llevo = mochila_recursiva(w, elementos_distribuidos, n - 1, entrada,lista_no_llevo)
+
+    resp = max(llevo, no_llevo)
+    if (resp == llevo):
+        for i in lista_llevo:
+            soluciones.append(i)
+    else:
+        for i in lista_no_llevo:
+            soluciones.append(i)
+
+    return resp
