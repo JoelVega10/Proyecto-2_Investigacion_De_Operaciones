@@ -1,0 +1,13 @@
+Pruebas http://rna.informatik.uni-freiburg.de/Teaching/index.jsp?toolName=Needleman-Wunsch
+
+AGTC
+AAGCA
+
+AAGCA ATGC_ 0
+--- 188.4856882095337 seconds ---"
+
+AGTCA
+AAGCA
+
+AGTCA AGACA 3
+--- 548.8642439842224 seconds ---

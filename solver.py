@@ -1,7 +1,9 @@
 import sys
 import numpy as np
+import time
 from itertools import permutations
-from functools import partial
+from collections import defaultdict
+start_time = time.time()
 #------------------------------------------------------Entrada txt-----------------------------------------------------#
 
 ''' Abrir archivo recibe un archivo txt y almacena su contenido en la variable lineas'''
@@ -110,7 +112,7 @@ def mochila_progra_dinamica(input):
 def mochila_fuerza_bruta(input):
     entrada = abrir_archivo(input)
     i = 0
-    while (i < len(lineas)):
+    while (i < len(entrada)):
         entrada[i] = [int(e) for e in entrada[i].split(',')]
         i += 1
     w = entrada[0][0]
@@ -236,47 +238,47 @@ def encontrar_secuencias(matriz,hilera1,hilera2,bandera):
         print("Hilera 2: " + resp1)
 
 #--------------------------------------------------Alineamiento FB-----------------------------------------------------#
+def maximo_valor(permutacionH1,hilera2,memo,largo):
+    i = 0
+    maximo = -10000
+    resp = []
+    for p in permutations(hilera2 + "_" * (largo)):
+        if p not in memo[permutacionH1]:
+            memo[permutacionH1][p] = valor_secuencia(permutacionH1,p)
+            if memo[permutacionH1][p][2]>maximo:
+                maximo = memo[permutacionH1][p][2]
+                resp = memo[permutacionH1][p]
+    return resp
 
+
+def valor_secuencia(permutacion1,permutacion2):
+    valor = 0
+    for i in range(len(permutacion1)):
+        if permutacion1[i] == "_" or permutacion2[i] == "_":
+            valor += -2
+        elif permutacion1[i] == permutacion2[i]:
+            valor += 1
+        else:
+            valor += -1
+    return [permutacion1,permutacion2,valor]
 
 def obtener_combinaciones_secuencias(hilera1,hilera2):
-    maxi = len(hilera1)
     resta = len(hilera1)-len(hilera2)
-    n = maxi
-    combinacionesH1 = []
-    combinacionesH2 = []
+    n = len(hilera1)-1
+    maximo = -10000
+    resp = []
     while(n >= 0):
-        combinacionesH1 = combinacionesH1 + [''.join(p)for p in permutations(hilera1 + "_"*n)]
-        combinacionesH2 = combinacionesH2 + [''.join(p) for p in permutations(hilera2 + "_" * (n+resta))]
+        memo = defaultdict(dict)
+        for p in permutations(hilera1 + "_" * (n)):
+            if p not in memo:
+                res = maximo_valor(p, hilera2,memo,n+resta)
+                if res[2] > maximo:
+                    maximo = res[2]
+                    resp = res
+                    print(resp)
         n-=1
-    return [combinacionesH1,combinacionesH2]
+    print(('').join(resp[0])+" "+('').join(resp[1])+" "+str(resp[2]))
 
-
-def obtener_valor_combinaciones(combinacion1,combinacion2,i):
-    valor = 0
-    for i in range(len(combinacion1)):
-        if combinacion1[i] == combinacion2[i]:
-            valor+=1
-        elif combinacion1[i] == "_" or combinacion2[i] == "_":
-            valor+=-2
-        else:
-            valor+=-1
-    return [valor,i]
-
-def todos_los_valores(combinacionesH1,combinacionesH2,bandera):
-
-    maximo = -10000000
-    i = -10000000
-    for i in range(len(combinacionesH1)):
-        lista = obtener_valor_combinaciones(combinacionesH1[i],combinacionesH2[i],i)
-        if lista[0] > maximo:
-            maximo = lista[0]
-            i = lista[1]
-    if bandera:
-        print("Hilera 1: " + combinacionesH1[i])
-        print("Hilera 2: " + combinacionesH2[i])
-    else:
-        print("Hilera 1: " + combinacionesH2[i])
-        print("Hilera 2: " + combinacionesH1[i])
 
 def alineamiento_fuerza_bruta(input):
     entrada = abrir_archivo(input)
@@ -286,8 +288,7 @@ def alineamiento_fuerza_bruta(input):
     if len(hilera1) < len(hilera2):
         hilera1 , hilera2 = hilera2 , hilera1
         bandera = False
-    combinaciones = obtener_combinaciones_secuencias(hilera1,hilera2)
-    todos_los_valores(combinaciones[0],combinaciones[1],bandera)
+    obtener_combinaciones_secuencias(hilera1,hilera2)
 
 
 #------------------------------------------------------- Main ---------------------------------------------------------#
@@ -319,4 +320,4 @@ def main():
             print("Problema no reconocido")
 
 main()
-
+print("--- %s seconds ---" % (time.time() - start_time))
