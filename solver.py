@@ -262,10 +262,12 @@ def valor_secuencia(permutacion1,permutacion2,hilera1,hilera2):
     k = 0
     for i in range(len(permutacion1)):
         if permutacion1[i] == "_":
-            k+=1
+            if permutacion2[i] != "_":
+                k+=1
             valor-=2
         elif permutacion2[i] == "_":
-            j+=1
+            if permutacion1[i] != "_":
+                j+=1
             valor-=2
         elif (j < len(hilera1) and k < len(hilera2)) and (
                 permutacion1[i].format(hilera1[j]) == permutacion2[i].format(hilera2[k])):
