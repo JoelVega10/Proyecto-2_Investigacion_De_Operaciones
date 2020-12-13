@@ -238,28 +238,44 @@ def encontrar_secuencias(matriz,hilera1,hilera2,bandera):
         print("Hilera 2: " + resp1)
 
 #--------------------------------------------------Alineamiento FB-----------------------------------------------------#
-def maximo_valor(permutacionH1,hilera2,memo,largo):
+def maximo_valor(permutacionH1,hilera1,memo,largo,hilera2):
     i = 0
     maximo = -10000
     resp = []
-    for p in permutations(hilera2 + "_" * (largo)):
+    simbolo = ['{}']
+    gaps = ['_']
+    lista = simbolo*len(hilera2)
+    lista1 = gaps * largo
+    per = lista+lista1
+    for p in permutations(per):
         if p not in memo[permutacionH1]:
-            memo[permutacionH1][p] = valor_secuencia(permutacionH1,p)
+            memo[permutacionH1][p] = valor_secuencia(list(permutacionH1),list(p),hilera1,hilera2)
             if memo[permutacionH1][p][2]>maximo:
                 maximo = memo[permutacionH1][p][2]
                 resp = memo[permutacionH1][p]
     return resp
 
 
-def valor_secuencia(permutacion1,permutacion2):
+def valor_secuencia(permutacion1,permutacion2,hilera1,hilera2):
     valor = 0
+    j = 0
+    k = 0
     for i in range(len(permutacion1)):
-        if permutacion1[i] == "_" or permutacion2[i] == "_":
-            valor += -2
-        elif permutacion1[i] == permutacion2[i]:
+        if permutacion1[i] == "_":
+            k+=1
+            valor-=2
+        elif permutacion2[i] == "_":
+            j+=1
+            valor-=2
+        elif (j < len(hilera1) and k < len(hilera2)) and (
+                permutacion1[i].format(hilera1[j]) == permutacion2[i].format(hilera2[k])):
+            k += 1
+            j += 1
             valor += 1
         else:
-            valor += -1
+            k+=1
+            j+=1
+            valor-=1
     return [permutacion1,permutacion2,valor]
 
 def obtener_combinaciones_secuencias(hilera1,hilera2):
@@ -269,15 +285,35 @@ def obtener_combinaciones_secuencias(hilera1,hilera2):
     resp = []
     while(n >= 0):
         memo = defaultdict(dict)
-        for p in permutations(hilera1 + "_" * (n)):
+        simbolo = ['{}']
+        gaps = ['_']
+        lista = simbolo * len(hilera1)
+        lista1 = gaps * n
+        per = lista+lista1
+        for p in permutations(per):
             if p not in memo:
-                res = maximo_valor(p, hilera2,memo,n+resta)
+                res = maximo_valor(p, hilera1,memo,n+resta,hilera2)
                 if res[2] > maximo:
                     maximo = res[2]
                     resp = res
-                    print(resp)
         n-=1
-    print(('').join(resp[0])+" "+('').join(resp[1])+" "+str(resp[2]))
+    h1 = ""
+    h2 = ""
+    j = 0
+    k = 0
+    for i in range(len(resp[0])):
+        if resp[0][i] == '{}':
+            h1 = h1 +resp[0][i].format(hilera1[j])
+            j+=1
+        else:
+            h1 = h1 + "_"
+        if resp[1][i] == '{}':
+            h2 = h2 +resp[1][i].format(hilera2[k])
+            k+=1
+        else:
+            h2 = h2 + "_"
+
+    print(h1 + " " + h2 + " " + str(resp[2]))
 
 
 def alineamiento_fuerza_bruta(input):
