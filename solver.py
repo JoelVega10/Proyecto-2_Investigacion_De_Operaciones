@@ -219,7 +219,6 @@ def encontrar_secuencias(matriz,hilera1,hilera2,bandera):
     resp1 = ""
     resp2 = ""
     while(i > 0 or j > 0):
-        print(str(i) + " "+str(j))
         if i == 0:
             resp2 = hilera2[j-1] + resp2
             resp1 = "_" + resp1
