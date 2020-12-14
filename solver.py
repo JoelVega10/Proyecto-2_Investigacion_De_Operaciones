@@ -11,7 +11,8 @@ def abrir_archivo(input):
     lineas = [line.rstrip() for line in open(sys.argv[3])]
     return lineas
 
-
+''' imprimir matriz, imprime los resultados de una matriz de una manera en que las filas y las columnas se vean representadas
+de una manera estetica'''
 def imprimir_matriz(matriz):
     print('\n'.join([''.join(['{:4}'.format(elemento) for elemento in fila])
       for fila in matriz]))
@@ -89,7 +90,8 @@ def imprimir_soluciones_mochila_pd(matriz,w,soluciones,elementos_distribuidos):
         if soluciones[i] != 0:
             print(str(i+1)+","+str(soluciones[i])+ " # articulo " + str(i+1) + " " + str(soluciones[i]) + " unidades")
 
-
+'''Mochila progra dinamica, llama a todas las funciones necesarias para imprimir la solucion de la mochila, recibe el nombre del archivo
+de entrada e imprime la solucion de la mochila.'''
 def mochila_progra_dinamica(input):
     entrada = abrir_archivo(input)
     i = 0
@@ -108,7 +110,8 @@ def mochila_progra_dinamica(input):
 
 
 #-------------------------------------------------------Mochila FB-----------------------------------------------------#
-
+'''Mochila progra dinamica, llama a todas las funciones necesarias para imprimir la solucion de la mochila, recibe el nombre del archivo
+de entrada e imprime la solucion de la mochila.'''
 def mochila_fuerza_bruta(input):
     entrada = abrir_archivo(input)
     i = 0
@@ -130,7 +133,9 @@ def mochila_fuerza_bruta(input):
     for i in range(len(respuesta)):
         if respuesta[i]!=0:
             print(str(i+1)+","+str(respuesta[i]) + " # articulo " + str(i+1) + " " + str(respuesta[i]) + " unidades")
-
+'''Mochila recursiva, realiza la solucion de la mochila de una manera recursiva usando fuerza bruta, recibe el peso total que se tiene,
+los elementos que se pueden utilizar, la cantidad de elementos, la entrada generada por el archivo txt, y una lista de soluciones
+que esta llena de ceros al inicio para saber cuantas veces se uso un elemento'''
 def mochila_recursiva(w, elementos_distribuidos,n,entrada,soluciones):
     lista_llevo = []
     lista_no_llevo = []
@@ -154,7 +159,8 @@ def mochila_recursiva(w, elementos_distribuidos,n,entrada,soluciones):
 
     return resp
 #--------------------------------------------------Alineamiento PD-----------------------------------------------------#
-
+'''Alineamiento progra dinamica, llama a todas las funciones necesarias para imprimir la solucion del alineamiento de dos hileras, 
+recibe el nombre del archivo de entrada e imprime la solucion del alineamiento.'''
 def alineamiento_progra_dinamica(input):
     entrada = abrir_archivo(input)
     hilera1 = entrada[1]
@@ -168,7 +174,11 @@ def alineamiento_progra_dinamica(input):
     encontrar_secuencias(matriz,hilera1,hilera2,bandera)
 
 
-
+'''
+Crear matriz inicial alineamiento, recibe las dos hileras que se les va realizar el alineamiento y devuelve una matriz llena de ceros del tamaño 
+de filas de la hilera uno y el tamaño de columnas de la hilera dos, y despues en la primera columna y primera fila se multiplica el indice por menos 
+dos, para tener en cuenta el valor de los gaps 
+'''
 def crear_matriz_inicial_alineamiento_pd(hilera1,hilera2):
     matriz = []
     for i in range(len(hilera1)+1):
@@ -184,7 +194,10 @@ def crear_matriz_inicial_alineamiento_pd(hilera1,hilera2):
         j+=1
     return matriz
 
-
+'''
+Llenar matriz alineamiento recorre cada posicion y coloca el valor adecuado segun las posiciones anteriores en la matriz, recibe la matriz
+la hilera 1 y la hilera 2.
+'''
 def llenar_matriz_alineamiento_pd(matriz,hilera1,hilera2):
     i = 1
     while(i<len(matriz)):
@@ -196,6 +209,10 @@ def llenar_matriz_alineamiento_pd(matriz,hilera1,hilera2):
                 matriz[i][j] = max(matriz[i-1][j]-2,matriz[i][j-1]-2,matriz[i-1][j-1]-1)
             j+=1
         i+=1
+'''
+Encontrar secuencias se coloca en la ultima posicion de la matriz con los valores ya colocados, y de acuerdo a la ruta que tome va creando la respuesta
+de las dos hileras, recibe la matriz, hilera 1 , hilera 2 y una bandera que indica si en algun momento se intercambio la hilera 1 con la hilera 2
+'''
 def encontrar_secuencias(matriz,hilera1,hilera2,bandera):
     i = len(matriz)-1
     j = len(matriz[0])-1
@@ -244,6 +261,10 @@ def encontrar_secuencias(matriz,hilera1,hilera2,bandera):
 
 
 #--------------------------------------------------Alineamiento FB-----------------------------------------------------#
+'''
+Maximo valor, saca el maximo valor de una permutacion de la hilera 1, con todas las permutaciones de la hilera 2, y devuelve el maximo valor encontrado
+la permutacion de la hilera 1 y la permutacion de la hilera 2 con la cual se obtuvo ese valor 
+'''
 def maximo_valor(permutacionH1,hilera1,memo,largo,hilera2):
     i = 0
     maximo = -10000
@@ -261,7 +282,10 @@ def maximo_valor(permutacionH1,hilera1,memo,largo,hilera2):
                 resp = memo[permutacionH1][p]
     return resp
 
-
+'''
+Valor secuencia, recibe dos permutaciones, uno de la hilera 1 y otra de la hilera 2, y compara si hay un match se le suma 1 al valor, si hay un mismatch
+se le resta 1 al valor y si hay un gap se le resta 2 al valor. Devuelve una lista con las permutaciones comparadas y el valor resultante.
+'''
 def valor_secuencia(permutacion1,permutacion2,hilera1,hilera2):
     valor = 0
     j = 0
@@ -285,7 +309,11 @@ def valor_secuencia(permutacion1,permutacion2,hilera1,hilera2):
             j+=1
             valor-=1
     return [permutacion1,permutacion2,valor]
-
+'''
+Obtener combinaciones secuencias recibe la hilera1 y la hilera2, y saca las combinaciones del tamaño de la suma de las dos hileras, añadiendo gaps, 
+hasta el tamaño de la hilera con el mayor largo, sacando el maximo valor de las combinaciones de estas permutaciones, e imprime al final 
+las dos permutaciones que dieron resultado al mayor valor y valor resultante.
+'''
 def obtener_combinaciones_secuencias(hilera1,hilera2,bandera):
     resta = len(hilera1)-len(hilera2)
     n = len(hilera1)-1
@@ -328,7 +356,8 @@ def obtener_combinaciones_secuencias(hilera1,hilera2,bandera):
         print("Hilera 1: " + h2)
         print("Hilera 2: " + h1)
 
-
+'''Alineamiento fuerza bruta , llama a todas las funciones necesarias para imprimir la solucion del alineamiento de dos hileras
+recibe el nombre del archivo de entrada e imprime la solucion de la del alineamiento.'''
 def alineamiento_fuerza_bruta(input):
     entrada = abrir_archivo(input)
     hilera1 = entrada[1]
@@ -341,6 +370,7 @@ def alineamiento_fuerza_bruta(input):
 
 
 #------------------------------------------------------- Main ---------------------------------------------------------#
+'''Main es el controlador, que de acuerdo a la entrada, llama a los metodos indicados por el usuario en terminal'''
 def main():
     if sys.argv[1] == "-h":
         print("El presente proyecto se ejecuta en terminal de la siguiente manera:")
@@ -369,4 +399,5 @@ def main():
             print("Problema no reconocido")
 
 main()
+#Imprime el tiempo que paso en la ejecucion del programa
 print("--- %s segundos ---" % (time.time() - start_time))
