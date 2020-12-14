@@ -13,8 +13,8 @@ def abrir_archivo(input):
 
 
 def imprimir_matriz(matriz):
-    print('\n'.join([''.join(['{:4}'.format(item) for item in row])
-      for row in matriz]))
+    print('\n'.join([''.join(['{:4}'.format(elemento) for elemento in fila])
+      for fila in matriz]))
 
 
 #-------------------------------------------------------Mochila PD-----------------------------------------------------#
@@ -87,7 +87,7 @@ def imprimir_soluciones_mochila_pd(matriz,w,soluciones,elementos_distribuidos):
     print(matriz[len(elementos_distribuidos)-1][w])
     for i in range(len(soluciones)):
         if soluciones[i] != 0:
-            print(str(i+1)+","+str(soluciones[i]))
+            print(str(i+1)+","+str(soluciones[i])+ " # articulo " + str(i+1) + " " + str(soluciones[i]) + " unidades")
 
 
 def mochila_progra_dinamica(input):
@@ -129,12 +129,11 @@ def mochila_fuerza_bruta(input):
     print(beneficio)
     for i in range(len(respuesta)):
         if respuesta[i]!=0:
-            print(str(i+1)+","+str(respuesta[i]))
+            print(str(i+1)+","+str(respuesta[i]) + " # articulo " + str(i+1) + " " + str(respuesta[i]) + " unidades")
 
 def mochila_recursiva(w, elementos_distribuidos,n,entrada,soluciones):
     lista_llevo = []
     lista_no_llevo = []
-
     if n == 0 or w == 0:
         return 0
     if (elementos_distribuidos[n-1][0] > w):
@@ -176,11 +175,13 @@ def crear_matriz_inicial_alineamiento_pd(hilera1,hilera2):
         temp = generador_lista_de_ceros(len(hilera2)+1)
         matriz.append(temp)
     sum = -2
-    for j in range(1,len(hilera1)+1):
-        if j != len(hilera2)+1:
+    j = 1
+    while(j<=len(hilera1)):
+        if j <= len(hilera2):
             matriz[0][j] = sum
         matriz[j][0] = sum
         sum+=-2
+        j+=1
     return matriz
 
 
@@ -195,13 +196,13 @@ def llenar_matriz_alineamiento_pd(matriz,hilera1,hilera2):
                 matriz[i][j] = max(matriz[i-1][j]-2,matriz[i][j-1]-2,matriz[i-1][j-1]-1)
             j+=1
         i+=1
-
 def encontrar_secuencias(matriz,hilera1,hilera2,bandera):
     i = len(matriz)-1
     j = len(matriz[0])-1
     resp1 = ""
     resp2 = ""
     while(i > 0 or j > 0):
+        print(str(i) + " "+str(j))
         if i == 0:
             resp2 = hilera2[j-1] + resp2
             resp1 = "_" + resp1
@@ -217,25 +218,30 @@ def encontrar_secuencias(matriz,hilera1,hilera2,bandera):
             j-=1
         else:
             maximo = max(matriz[i][j-1],matriz[i-1][j],matriz[i-1][j-1])
-            if maximo == matriz[i][j-1]:
+            if maximo == matriz[i-1][j-1]:
+                resp1 = hilera1[i - 1] + resp1
                 resp2 = hilera2[j - 1] + resp2
-                resp1 = "_" + resp1
+                i -= 1
                 j -= 1
             elif maximo == matriz[i-1][j]:
                 resp2 = "_" + resp2
                 resp1 = hilera1[i - 1] + resp1
                 i-=1
             else:
-                resp1 = hilera1[i - 1] + resp1
                 resp2 = hilera2[j - 1] + resp2
-                i -= 1
-                j-=1
+                resp1 = "_" + resp1
+                j -= 1
+
+    print("Tabla de resultados: ")
+    imprimir_matriz(matriz)
+    print("Scoring Final: " + str(matriz[len(matriz)-1][len(matriz[0])-1]))
     if bandera:
         print("Hilera 1: " + resp1)
         print("Hilera 2: " + resp2)
     else:
         print("Hilera 1: " + resp2)
         print("Hilera 2: " + resp1)
+
 
 #--------------------------------------------------Alineamiento FB-----------------------------------------------------#
 def maximo_valor(permutacionH1,hilera1,memo,largo,hilera2):
@@ -280,7 +286,7 @@ def valor_secuencia(permutacion1,permutacion2,hilera1,hilera2):
             valor-=1
     return [permutacion1,permutacion2,valor]
 
-def obtener_combinaciones_secuencias(hilera1,hilera2):
+def obtener_combinaciones_secuencias(hilera1,hilera2,bandera):
     resta = len(hilera1)-len(hilera2)
     n = len(hilera1)-1
     maximo = -10000
@@ -314,8 +320,13 @@ def obtener_combinaciones_secuencias(hilera1,hilera2):
             k+=1
         else:
             h2 = h2 + "_"
-
-    print(h1 + " " + h2 + " " + str(resp[2]))
+    print("Scoring Final: " + str(resp[2]))
+    if bandera:
+        print("Hilera 1: " + h1)
+        print("Hilera 2: " + h2)
+    else:
+        print("Hilera 1: " + h2)
+        print("Hilera 2: " + h1)
 
 
 def alineamiento_fuerza_bruta(input):
@@ -326,7 +337,7 @@ def alineamiento_fuerza_bruta(input):
     if len(hilera1) < len(hilera2):
         hilera1 , hilera2 = hilera2 , hilera1
         bandera = False
-    obtener_combinaciones_secuencias(hilera1,hilera2)
+    obtener_combinaciones_secuencias(hilera1,hilera2,bandera)
 
 
 #------------------------------------------------------- Main ---------------------------------------------------------#
@@ -358,4 +369,4 @@ def main():
             print("Problema no reconocido")
 
 main()
-print("--- %s seconds ---" % (time.time() - start_time))
+print("--- %s segundos ---" % (time.time() - start_time))
